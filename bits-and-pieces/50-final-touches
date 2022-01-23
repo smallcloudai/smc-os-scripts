@@ -12,6 +12,7 @@ ExecStart=/root/smc-os-scripts/bits-and-pieces/mount-encrypted-home.sh
 WantedBy=multi-user.target
 " > /etc/systemd/system/mount-encrypted-home.service
 systemctl daemon-reload
+systemctl enable mount-encrypted-home.service
 
 # Before giving VM to you, SMC hypervisor will:
 # 1. Mount /
