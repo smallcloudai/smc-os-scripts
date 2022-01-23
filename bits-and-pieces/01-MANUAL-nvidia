@@ -1,0 +1,10 @@
+# qm set 110 --hostpci2=82:00,pcie=1,x-vga=on
+# wget https://us.download.nvidia.com/XFree86/Linux-x86_64/470.94/NVIDIA-Linux-x86_64-470.94.run
+# generate key pair to sign kernel modules
+# "An X.509 certificate containing the public signing key will be installed to /usr/share/nvidia/nvidia-modsign-crt-5B37D31E.der. The SHA1 fingerprint of this certificate is:
+# 5B:37:D3:1E:47:0E:2D:91:50:8D:D4:9A:DC:8D:82:4E:DF:0C:F4:FF."
+# Delete private key -- yes
+# Enter password "aa"
+# mokutil --import /usr/share/nvidia/nvidia-modsign-crt-5B37D31E.der
+# In bios, accept key, enter password
+# rm NVIDIA-Linux-x86_64-470.94.run

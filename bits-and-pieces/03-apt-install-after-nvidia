@@ -1,0 +1,27 @@
+#!/bin/bash
+set -xe
+DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    curl \
+    ca-certificates \
+    sudo \
+    git \
+    bzip2 \
+    rsyslog \
+    mc \
+    rsync \
+    inetutils-ping \
+    net-tools \
+    psmisc \
+    telnet \
+    vim \
+    p7zip \
+    python3 \
+    python3-pip \
+    mpich \
+    libmpich-dev \
+    libaio-dev \
+    strace \
+    clang-11 \
+    lldb-11 \
+    lld-11 \
+    clangd-11

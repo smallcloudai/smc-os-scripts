@@ -1,0 +1,26 @@
+#!/bin/sh
+set -xe
+echo "export PATH=/usr/local/miniconda/bin:\$PATH" > /etc/profile.d/50-smc.sh
+
+echo "[Unit]
+Description=Mount Encrypted Home
+
+[Service]
+ExecStart=/root/smc-os-scripts/bits_and_pieces/mount-encrypted-home.sh
+
+[Install]
+WantedBy=multi-user.target
+" > /etc/systemd/system/mount-encrypted-home.service
+sed -i 's/After=network.target auditd.service/After=network.target auditd.service mount-encrypted-home.service/' /etc/systemd/system/sshd.service
+# This works as assert that sed worked:
+grep -q mount-encrypted-home.service /etc/systemd/system/sshd.service
+
+# Before giving VM to you, SMC hypervisor will:
+# 1. Mount /
+# 2. Run ssh-keygen to generate new host identity, send fingerprint to you to put into known_hosts.
+# 3. Set hostname the same as your task name.
+# 4. Set static IP address.
+# 5. Forbid password authentication.
+# 6. Write a welcome message to update-motd.d/
+# 7. Unmount /
+# 8. Start VM.
