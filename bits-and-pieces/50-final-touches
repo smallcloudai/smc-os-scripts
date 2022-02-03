@@ -14,12 +14,13 @@ WantedBy=multi-user.target
 systemctl daemon-reload
 systemctl enable mount-encrypted-home.service
 
-# Before giving VM to you, SMC hypervisor will:
-# 1. Mount /
+# Before giving a VM to you, SMC hypervisor will:
+# 1. Mount / on hypervisor
 # 2. Run ssh-keygen to generate new host identity, send fingerprint to you to put into known_hosts.
 # 3. Set hostname the same as your task name.
 # 4. Set a static IP address.
 # 5. Forbid password authentication.
 # 6. Write a welcome message to update-motd.d/
-# 7. Unmount /
-# 8. Start VM.
+# 7. Install or not an agent depending on the task settings (see web UI).
+# 8. Unmount /
+# 9. Start VM.
