@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -xe
 echo "export PATH=/usr/local/miniconda/bin:\$PATH" > /etc/profile.d/50-smc.sh
 

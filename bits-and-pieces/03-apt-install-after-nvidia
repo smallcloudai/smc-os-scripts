@@ -25,3 +25,8 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y \
     lldb-11 \
     lld-11 \
     clangd-11
+apt-get purge -y --auto-remove unattended-upgrades
+systemctl disable apt-daily-upgrade.timer
+systemctl mask apt-daily-upgrade.service
+systemctl disable apt-daily.timer
+systemctl mask apt-daily.service

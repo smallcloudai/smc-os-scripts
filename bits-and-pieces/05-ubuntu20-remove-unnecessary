@@ -1,3 +1,4 @@
+#!/bin/bash
 set -xe
 rm /etc/update-motd.d/10-help-text
 rm /etc/update-motd.d/50-motd-news
