@@ -1,4 +1,6 @@
 #!/bin/bash
 set -xe
+export DEBIAN_FRONTEND=noninteractive
 apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get -y install gcc cmake make
+apt-get -y upgrade
+apt-get -y install gcc cmake make
