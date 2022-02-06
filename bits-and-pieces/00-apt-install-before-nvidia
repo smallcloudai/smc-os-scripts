@@ -2,5 +2,5 @@
 set -xe
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get -y upgrade
 apt-get -y install gcc cmake make
+apt -y upgrade
