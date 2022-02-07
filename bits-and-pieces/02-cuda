@@ -1,0 +1,5 @@
+#!/bin/bash
+set -xe
+wget https://developer.download.nvidia.com/compute/cuda/11.4.0/local_installers/cuda_11.4.0_470.42.01_linux.run
+bash cuda_11.4.0_470.42.01_linux.run --silent --toolkit --no-opengl-libs
+rm cuda_11.4.0_470.42.01_linux.run
