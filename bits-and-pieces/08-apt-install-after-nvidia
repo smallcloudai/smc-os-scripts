@@ -1,6 +1,8 @@
 #!/bin/bash
 set -xe
-DEBIAN_FRONTEND=noninteractive apt-get install -y \
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y \
     curl \
     ca-certificates \
     sudo \
