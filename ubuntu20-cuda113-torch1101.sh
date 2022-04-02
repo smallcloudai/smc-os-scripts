@@ -1,4 +1,5 @@
 #!/bin/bash
+set -xe
 . bits-and-pieces/02-cuda
 . bits-and-pieces/05-llvm
 . bits-and-pieces/08-apt-install-after-nvidia
