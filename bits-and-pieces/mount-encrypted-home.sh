@@ -10,6 +10,7 @@ tar -czf /tmp/homes.tar.gz /home
 mount /dev/mapper/throwawaykey /home
 tar -xzf /tmp/homes.tar.gz -C /
 echo "Successfully mounted encrypted home"
+rm /tmp/homes.tar.gz
 
 # To destroy data (doesn't really work IRL because shell is started home)
 # umount /home; dmsetup remove_all --force

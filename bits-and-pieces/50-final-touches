@@ -12,6 +12,18 @@ ExecStart=/root/smc-os-scripts/bits-and-pieces/mount-encrypted-home.sh
 [Install]
 WantedBy=multi-user.target
 " > /etc/systemd/system/mount-encrypted-home.service
+
+echo "[Unit]
+Description=Unpack and Run Code
+
+[Service]
+ExecStart=/root/smc-os-scripts/bits-and-pieces/unpack-and-run.sh
+
+[Install]
+WantedBy=multi-user.target
+" > /etc/systemd/system/unpack-and-run.service
+
+sed -i 's/After=network.target auditd.service/After=network.target auditd.service mount-encrypted-home.service/' /etc/systemd/system/sshd.service
 systemctl daemon-reload
 systemctl enable mount-encrypted-home.service
 
