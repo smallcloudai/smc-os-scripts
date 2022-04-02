@@ -23,9 +23,10 @@ ExecStart=/root/smc-os-scripts/bits-and-pieces/unpack-and-run.sh
 WantedBy=multi-user.target
 " > /etc/systemd/system/unpack-and-run.service
 
-sed -i 's/After=network.target auditd.service/After=network.target auditd.service mount-encrypted-home.service/' /etc/systemd/system/sshd.service
+#sed -i 's/After=network.target auditd.service/After=network.target auditd.service mount-encrypted-home.service/' /etc/systemd/system/sshd.service
 systemctl daemon-reload
 systemctl enable mount-encrypted-home.service
+systemctl enable unpack-and-run.service
 
 # Before giving a VM to you, SMC hypervisor will:
 # 1. Mount / on hypervisor
