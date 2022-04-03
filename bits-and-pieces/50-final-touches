@@ -6,6 +6,7 @@ apt-get clean
 echo "[Unit]
 Description=Mount Encrypted Home
 Before=sshd.service
+Requires=sshd.service
 
 [Service]
 ExecStart=/root/smc-os-scripts/bits-and-pieces/mount-encrypted-home.sh
@@ -17,6 +18,7 @@ WantedBy=multi-user.target
 echo "[Unit]
 Description=Unpack and Run Code
 After=mount-encrypted-home.service
+Requires=mount-encrypted-home.service
 
 [Service]
 ExecStart=/root/smc-os-scripts/bits-and-pieces/unpack-and-run.sh
