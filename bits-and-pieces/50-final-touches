@@ -25,6 +25,7 @@ Requires=mount-encrypted-home.service
 [Service]
 ExecStart=/root/smc-os-scripts/bits-and-pieces/unpack-and-run.sh
 Type=oneshot
+KillMode=process
 
 [Install]
 WantedBy=multi-user.target
