@@ -1,5 +1,8 @@
 #!/bin/bash
 set -xe
+if [ -b /dev/mapper/throwawaykey ]; then
+    exit 0
+fi
 # Works as assert to make sure /dev/vdb exists:
 ls /dev/vd* | grep vdb
 throwawaykey=`openssl rand -hex 32`
