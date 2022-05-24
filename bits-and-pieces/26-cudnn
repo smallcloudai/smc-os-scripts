@@ -1,0 +1,3 @@
+#!/bin/bash
+export PATH=/usr/local/miniconda/bin:$PATH
+conda install cudnn==8.2.1

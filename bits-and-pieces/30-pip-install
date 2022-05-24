@@ -1,4 +1,4 @@
 #!/bin/bash
 export PATH=/usr/local/miniconda/bin:$PATH
 SETUPTOOLS_USE_DISTUTILS=stdlib pip install mpi4py
-pip install wandb matplotlib IPython blobfile cloudpickle filelock numpy boostedblob tokenizers py-spy pytest pandas
+pip install wandb matplotlib IPython blobfile cloudpickle filelock numpy boostedblob tokenizers py-spy pytest pandas tensorflow notebook
