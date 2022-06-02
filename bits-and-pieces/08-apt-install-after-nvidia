@@ -17,6 +17,7 @@ apt-get install -y \
     telnet \
     vim \
     p7zip \
+    numactl \
     python3 \
     python3-pip \
     mpich \

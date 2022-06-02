@@ -1,0 +1,15 @@
+#!/bin/bash
+# Default entrypoint for SMC containers
+cd /home/user
+while true
+do
+    while [ "$SMC_MULTI_NODE" -eq 1 ]
+    do
+        sleep 1
+        su user -c /home/user/smc_multinode_setup && break
+    done
+    sleep 60 || break
+    if [ -f /home/user/results_upload_script ]; then
+        su user -c /home/user/results_upload_script
+    fi
+done
