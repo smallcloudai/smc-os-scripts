@@ -5,10 +5,12 @@ while true
 do
     while [ "$SMC_MULTI_NODE" -eq 1 ]
     do
-        sleep 1
-        su user -c /home/user/smc_multinode_setup && break
+        su user -c "sleep 1" || exit 1
+        if [ -f /home/user/smc_multinode_setup ]; then
+            su user -c /home/user/smc_multinode_setup && break
+        fi
     done
-    sleep 60 || break
+    su user -c "sleep 60" || exit
     if [ -f /home/user/results_upload_script ]; then
         su user -c /home/user/results_upload_script
     fi

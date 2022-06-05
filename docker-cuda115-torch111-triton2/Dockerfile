@@ -71,14 +71,16 @@ RUN wget --quiet https://content.mellanox.com/ofed/MLNX_OFED-5.6-1.0.3.3/MLNX_OF
     MLNX_OFED_LINUX-5.6-1.0.3.3-ubuntu20.04-x86_64/mlnxofedinstall --user-space-only --without-fw-update -q && \
     rm -rf MLNX_OFED_LINUX-5.6*
 
-USER user
-RUN pip install mpi4py wandb matplotlib IPython blobfile cloudpickle filelock numpy redis boostedblob tokenizers py-spy pytest pandas
-RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
-RUN git clone https://github.com/NVIDIA/nccl-tests && make MPI=1 MPI_HOME=/usr/mpi_home/ -j8 -C nccl-tests
-RUN git clone https://github.com/NVIDIA/cuda-samples
-RUN git clone https://github.com/openai/triton && pip install -e triton/python
-RUN git clone https://github.com/Syllo/nvtop && cd nvtop && cmake . --install-prefix=/usr && make && sudo make install
+USER user
+RUN pip install --no-cache-dir mpi4py wandb matplotlib IPython blobfile cloudpickle filelock numpy redis boostedblob tokenizers py-spy pytest pandas && \
+    pip install --no-cache-dir torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+
+RUN mkdir from-source
+RUN cd from-source && git clone https://github.com/NVIDIA/nccl-tests && make MPI=1 MPI_HOME=/usr/mpi_home/ -j8 -C nccl-tests
+RUN cd from-source && git clone https://github.com/openai/triton && pip install -e triton/python
+RUN cd from-source && git clone https://github.com/Syllo/nvtop && cd nvtop && cmake . --install-prefix=/usr && make && sudo make install
 
 COPY sleep_script /home/user/sleep_script
 USER root
