@@ -1,6 +1,13 @@
 #!/bin/bash
 # Default entrypoint for SMC containers
 cd /home/user
+
+upload_results() {
+    if [ -f /home/user/results_upload_script ]; then
+        su user -c "bash --login /home/user/results_upload_script"
+    fi
+}
+
 while true
 do
     while [ "$SMC_MULTI_NODE" -eq 1 ]
@@ -10,8 +17,9 @@ do
             su user -c /home/user/smc_multinode_setup && break
         fi
     done
-    su user -c "sleep 60" || exit
-    if [ -f /home/user/results_upload_script ]; then
-        su user -c /home/user/results_upload_script
-    fi
+    su user -c "sleep 60" || exit    # sleep is killable by user, container will exit
+    upload_results
 done
+
+# final upload before exiting container
+upload_results
