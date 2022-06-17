@@ -13,13 +13,16 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y \
     ca-certificates \
     sudo \
     git \
+    git-lfs \
     bzip2 \
     openssh-server \
     rsyslog \
     mc \
+    htop \
+    tmux \
+    vim \
     rsync \
     inetutils-ping net-tools psmisc telnet \
-    vim \
     p7zip \
     python3 python3-pip \
     mpich libmpich-dev \
