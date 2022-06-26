@@ -3,23 +3,49 @@
 cd /home/user
 
 upload_results() {
+    # It's up to you to write results_upload_script to upload whatever results you want
+    echo "upload_results"
     if [ -f /home/user/results_upload_script ]; then
+        echo "upload_results see /home/user/results_upload_script"
         su user -c "bash --login /home/user/results_upload_script"
     fi
 }
 
-while true
+need_restart=1
+while [ ! -f /tmp/shutdown-container ]
 do
-    while [ "$SMC_MULTI_NODE" -eq 1 ]
-    do
+    while [ "$SMC_MULTI_NODE" -eq 1 ]; do
         su user -c "sleep 1" || exit 1
         if [ -f /home/user/smc_multinode_setup ]; then
-            su user -c /home/user/smc_multinode_setup && break
+            su user -c /home/user/smc_multinode_setup || need_restart=1
+            break
         fi
     done
-    su user -c "sleep 60" || exit    # sleep is killable by user, container will exit
+    if [ "$SMC_ZIP_FILESECRET" != "" ] && hostname | grep -q '\-00$'; then
+        # Without code.zip it's up to you to upload and run your code
+        if [ ! -f /home/user/code.7z ]; then
+            su user -c "wget -q -O /home/user/code.7z https://www.smallcloud.ai/v1/task-file-download?fn=${SMC_ZIP_FILESECRET}"
+        fi
+        if [ "$need_restart" -eq 1 ]; then
+            killall -s SIGUSR1 python
+            countdown=60
+            while [ -n "$(pidof python)" ]; do
+                sleep 1
+                countdown=$((countdown - 1))
+                if [ $countdown -eq 0 ]; then
+                    killall -9 python
+                    break
+                fi
+            done
+            need_restart=0
+            su user -c "wget -q -O /home/user/pickled-function-call.pkl https://www.smallcloud.ai/v1/task-file-download?fn=${SMC_PKL_FILESECRET}"
+            su user -c 'bash --login -c "python smc_unpack_code.py"'
+            su user -c 'bash --login -c "nohup 2>&1 mpirun -prepend-rank -f mpihosts python smc_run_task.py | tee --append ~/output.log &"'
+        fi
+    fi
+    su user -c "sleep 60" || break    # sleep is killable by user, the container will exit
     upload_results
 done
 
-# final upload before exiting container
+# final upload before exiting the container
 upload_results
