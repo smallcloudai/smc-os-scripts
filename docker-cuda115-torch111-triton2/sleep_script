@@ -26,21 +26,28 @@ do
         if [ ! -f /home/user/code.7z ]; then
             su user -c "wget -q -O /home/user/code.7z https://www.smallcloud.ai/v1/task-file-download?fn=${SMC_ZIP_FILESECRET}"
         fi
-        if [ "$need_restart" -eq 1 ]; then
-            killall -s SIGUSR1 python
-            countdown=60
-            while [ -n "$(pidof python)" ]; do
-                sleep 1
-                countdown=$((countdown - 1))
-                if [ $countdown -eq 0 ]; then
-                    killall -9 python
-                    break
-                fi
-            done
-            need_restart=0
-            su user -c "wget -q -O /home/user/pickled-function-call.pkl https://www.smallcloud.ai/v1/task-file-download?fn=${SMC_PKL_FILESECRET}"
-            su user -c 'bash --login -c "python smc_unpack_code.py"'
+    fi
+    if [ "$SMC_PKL_FILESECRET" != "" ] && [ "$need_restart" -eq 1 ]; then
+        # On all nodes, not just 00
+        killall -s SIGUSR1 python
+        countdown=60
+        while [ -n "$(pidof python)" ]; do
+            sleep 1
+            countdown=$((countdown - 1))
+            if [ $countdown -eq 0 ]; then
+                killall -9 python
+                break
+            fi
+        done
+    fi
+    if [ "$SMC_PKL_FILESECRET" != "" ] && [ "$need_restart" -eq 1 ] && hostname | grep -q '\-00$'; then
+        need_restart=0
+        su user -c "wget -q -O /home/user/pickled-function-call.pkl https://www.smallcloud.ai/v1/task-file-download?fn=${SMC_PKL_FILESECRET}"
+        su user -c 'bash --login -c "python smc_unpack_code.py"'
+        if [ -f /home/user/smc_multinode_setup ]; then
             su user -c 'bash --login -c "nohup 2>&1 mpirun -prepend-rank -f mpihosts python smc_run_task.py | tee --append ~/output.log &"'
+        else
+            su user -c 'bash --login -c "nohup 2>&1 mpirun -prepend-rank -n $SMC_GPUS python smc_run_task.py | tee --append ~/output.log &"'
         fi
     fi
     su user -c "sleep 60" || break    # sleep is killable by user, the container will exit
