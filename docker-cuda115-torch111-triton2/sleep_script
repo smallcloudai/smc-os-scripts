@@ -5,9 +5,9 @@ cd /home/user
 upload_results() {
     # It's up to you to write results_upload_script to upload whatever results you want
     echo "upload_results"
-    if [ -f /home/user/results_upload_script ]; then
+    if [ -f results_upload_script ]; then
         echo "upload_results see /home/user/results_upload_script"
-        su user -c "bash --login /home/user/results_upload_script"
+        su user -c "bash --login results_upload_script"
     fi
 }
 
@@ -19,12 +19,14 @@ do
         if [ -f /home/user/smc_multinode_setup ]; then
             su user -c /home/user/smc_multinode_setup || need_restart=1
             break
+        else
+            continue
         fi
     done
     if [ "$SMC_ZIP_FILESECRET" != "" ] && hostname | grep -q '\-00$'; then
         # Without code.zip it's up to you to upload and run your code
-        if [ ! -f /home/user/code.7z ]; then
-            su user -c "wget -q -O /home/user/code.7z https://www.smallcloud.ai/v1/task-file-download?fn=${SMC_ZIP_FILESECRET}"
+        if [ ! -f code.7z ]; then
+            su user -c "wget -q -O code.7z https://www.smallcloud.ai/v1/task-file-download?fn=${SMC_ZIP_FILESECRET}"
         fi
     fi
     if [ "$SMC_PKL_FILESECRET" != "" ] && [ "$need_restart" -eq 1 ]; then
@@ -40,11 +42,12 @@ do
             fi
         done
     fi
-    if [ "$SMC_PKL_FILESECRET" != "" ] && [ "$need_restart" -eq 1 ] && hostname | grep -q '\-00$'; then
+    if [ "$SMC_PKL_FILESECRET" != "" ] && [ "$need_restart" -eq 1 ] && [ -f smc_run_task.py ] && hostname | grep -q '\-00$'; then
+        # Only on node 00
         need_restart=0
-        su user -c "wget -q -O /home/user/pickled-function-call.pkl https://www.smallcloud.ai/v1/task-file-download?fn=${SMC_PKL_FILESECRET}"
+        su user -c "wget -q -O pickled-function-call.pkl https://www.smallcloud.ai/v1/task-file-download?fn=${SMC_PKL_FILESECRET}"
         su user -c 'bash --login -c "python smc_unpack_code.py"'
-        if [ -f /home/user/smc_multinode_setup ]; then
+        if [ -f smc_multinode_setup ]; then
             su user -c 'bash --login -c "nohup 2>&1 mpirun -prepend-rank -f mpihosts python smc_run_task.py | tee --append ~/output.log &"'
         else
             su user -c 'bash --login -c "nohup 2>&1 mpirun -prepend-rank -n $SMC_GPUS python smc_run_task.py | tee --append ~/output.log &"'
