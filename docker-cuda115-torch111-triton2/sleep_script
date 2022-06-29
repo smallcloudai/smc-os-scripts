@@ -14,28 +14,36 @@ upload_results() {
 need_restart=1
 while [ ! -f /tmp/shutdown-container ]
 do
-    while [ "$SMC_MULTI_NODE" -eq 1 ]; do
+    while [ "1$SMC_MULTI_NODE" -eq 11 ]; do
         su user -c "sleep 1" || exit 1
         if [ -f /home/user/smc_multinode_setup ]; then
-            su user -c /home/user/smc_multinode_setup || need_restart=1
-            break
-        else
-            continue
+            su user -c /home/user/smc_multinode_setup
+            if [ $? -eq 8 ]; then
+                need_restart=1
+                break
+            else
+                break
+            fi
         fi
     done
     if [ "$SMC_ZIP_FILESECRET" != "" ] && hostname | grep -q '\-00$'; then
         # Without code.zip it's up to you to upload and run your code
         if [ ! -f code.7z ]; then
             su user -c "wget -q -O code.7z https://www.smallcloud.ai/v1/task-file-download?fn=${SMC_ZIP_FILESECRET}"
+            if [ "$SMC_PKL_FILESECRET" == "" ]; then
+                # We are instructed not to run the code: unpack, do nothing else
+                su user -c 'bash --login -c "python smc_unpack_code.py"'
+            fi
         fi
     fi
-    if [ "$SMC_PKL_FILESECRET" != "" ] && [ "$need_restart" -eq 1 ]; then
-        # On all nodes, not just 00
+    if [ "$SMC_PKL_FILESECRET" != "" ] && [ "$need_restart" -eq 1 ] && hostname | grep -q '\-00$'; then
+        echo "Sent SIGUSR1 to all python processes..."
         killall -s SIGUSR1 python
         countdown=60
         while [ -n "$(pidof python)" ]; do
             sleep 1
             countdown=$((countdown - 1))
+            echo "Waiting for python to exit ($countdown)..."
             if [ $countdown -eq 0 ]; then
                 killall -9 python
                 break
