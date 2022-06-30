@@ -11,6 +11,21 @@ upload_results() {
     fi
 }
 
+shutdown_python() {
+    echo "Sent SIGUSR1 to all python processes..."
+    killall -s SIGUSR1 python
+    countdown=60
+    while [ -n "$(pidof python)" ]; do
+        sleep 1
+        countdown=$((countdown - 1))
+        echo "Waiting for python to exit ($countdown)..."
+        if [ $countdown -eq 0 ]; then
+            killall -9 python
+            break
+        fi
+    done
+}
+
 need_restart=1
 while [ ! -f /tmp/shutdown-container ]
 do
@@ -37,18 +52,7 @@ do
         fi
     fi
     if [ "$SMC_PKL_FILESECRET" != "" ] && [ "$need_restart" -eq 1 ] && hostname | grep -q '\-00$'; then
-        echo "Sent SIGUSR1 to all python processes..."
-        killall -s SIGUSR1 python
-        countdown=60
-        while [ -n "$(pidof python)" ]; do
-            sleep 1
-            countdown=$((countdown - 1))
-            echo "Waiting for python to exit ($countdown)..."
-            if [ $countdown -eq 0 ]; then
-                killall -9 python
-                break
-            fi
-        done
+        shutdown_python
     fi
     if [ "$SMC_PKL_FILESECRET" != "" ] && [ "$need_restart" -eq 1 ] && [ -f smc_run_task.py ] && hostname | grep -q '\-00$'; then
         # Only on node 00
@@ -64,6 +68,7 @@ do
     su user -c "sleep 60" || break    # sleep is killable by user, the container will exit
     upload_results
 done
-
+echo "Found /tmp/shutdown-container, exiting"
+shutdown_python
 # final upload before exiting the container
 upload_results
