@@ -12,7 +12,7 @@ upload_results() {
 }
 
 shutdown_python() {
-    echo "Sent SIGUSR1 to all python processes..."
+    echo "Sending SIGUSR1 to all python processes..."
     killall -s SIGUSR1 python
     countdown=60
     while [ -n "$(pidof python)" ]; do
@@ -41,13 +41,13 @@ do
             fi
         fi
     done
-    if [ "$SMC_ZIP_FILESECRET" != "" ] && hostname | grep -q '\-00$'; then
+    if [ "$SMC_ZIP_FILESECRET" != "" ] && [ -f /home/user/smc_unpack_code.py ] && hostname | grep -q '\-00$'; then
         # Without code.zip it's up to you to upload and run your code
         if [ ! -f code.7z ]; then
             su user -c "wget -q -O code.7z https://www.smallcloud.ai/v1/task-file-download?fn=${SMC_ZIP_FILESECRET}"
             if [ "$SMC_PKL_FILESECRET" == "" ]; then
                 # We are instructed not to run the code: unpack, do nothing else
-                su user -c 'bash --login -c "python smc_unpack_code.py"'
+                su user -c 'bash --login -c "python /home/user/smc_unpack_code.py"'
             fi
         fi
     fi
@@ -58,7 +58,7 @@ do
         # Only on node 00
         need_restart=0
         su user -c "wget -q -O pickled-function-call.pkl https://www.smallcloud.ai/v1/task-file-download?fn=${SMC_PKL_FILESECRET}"
-        su user -c 'bash --login -c "python smc_unpack_code.py"'
+        su user -c 'bash --login -c "python /home/user/smc_unpack_code.py"'
         if [ -f smc_multinode_setup ]; then
             su user -c 'bash --login -c "nohup 2>&1 mpirun -prepend-rank -f mpihosts python smc_run_task.py | tee --append ~/output.log &"'
         else
